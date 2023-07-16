@@ -3,24 +3,8 @@ if vim.g.loaded_gpt_sidekick == 1 then
 end
 vim.g.loaded_gpt_sidekick = 1
 
-local code_system_prompt = [[
-As an expert Full Stack Developer with over a decade of experience, demonstrating mastery in %s, your role is to assist me. When coding, deliver clean, efficient, and commented code according to best industry practices. Your tasks will include creating and debugging software and offering solutions to programming challenges.
-]]
-
-local ask_system_prompt = [[
-As an expert Full Stack Developer with over a decade of experience, demonstrating mastery in %s, your role is to assist me. When answering my questions, ensure that you provide comprehensive, precise, and easy-to-understand responses. When coding, deliver clean, efficient, and commented code according to best industry practices. You will also be expected to explain complex concepts in a simple, accessible way. Your tasks will include creating and debugging software, offering solutions to programming challenges, and giving advice on the optimal use of the technologies mentioned. In addition, be ready to guide me step-by-step through each coding process.
-]]
-
-local filetypes = {
-  ruby = { code = "ruby", technologies = "Ruby, Ruby on Rails and RSpec" },
-  eruby = { code = "erb", technologies = "Ruby, Ruby on Rails and RSpec" },
-  lua = { code = "lua", technologies = "Neovim and Lua" },
-  javascript = { code = "js", technologies = "JavaScript, HTML and CSS" },
-  javascriptreact = { code = "jsx", technologies = "JavaScript, React, HTML and CSS" },
-  typescript = { code = "ts", technologies = "JavaScript, TypeScript, HTML and CSS" },
-  typescriptreact = { code = "tsx", technologies = "JavaScript, TypeScript, React, HTML and CSS" },
-  python = { code = "python", technologies = "Python" },
-}
+local prompts = require 'gpt-sidekick.prompts'
+local filetypes = require 'gpt-sidekick.filetypes'
 
 local MODELS = { "gpt-3.5-turbo", "gpt-4" }
 
@@ -53,7 +37,7 @@ for _, model in ipairs(MODELS) do
     local status, res = client:chat({
       {
         role = "system",
-        content = string.format(ask_system_prompt, language.technologies),
+        content = string.format(prompts.ask_system_prompt, language.technologies),
       },
       { role = "user", content = prompt },
     }, {
@@ -101,7 +85,7 @@ for _, model in ipairs(MODELS) do
     local status, res = client:chat({
       {
         role = "system",
-        content = string.format(code_system_prompt, language.technologies),
+        content = string.format(prompts.code_system_prompt, language.technologies),
       },
       { role = "user", content = prompt },
     }, {
