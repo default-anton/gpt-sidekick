@@ -101,6 +101,7 @@ function M.ask(prompt_bufnr)
     -- Add assistant response to buffer
     vim.api.nvim_buf_set_lines(prompt_bufnr, -1, -1, false, { "", "ASSISTANT: " })
     vim.api.nvim_buf_set_lines(prompt_bufnr, -1, -1, false, content_lines)
+    vim.api.nvim_buf_set_lines(prompt_bufnr, -1, -1, false, { "", "USER: " })
   else
     vim.print("\nError: " .. vim.inspect(res))
   end
