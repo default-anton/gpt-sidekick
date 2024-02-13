@@ -7,4 +7,5 @@ return {
   typescript = { code = "ts", technologies = "JavaScript, TypeScript, HTML and CSS" },
   typescriptreact = { code = "tsx", technologies = "JavaScript, TypeScript, React, HTML and CSS" },
   python = { code = "python", technologies = "Python" },
+  go = { code = "go", technologies = "Go" },
 }

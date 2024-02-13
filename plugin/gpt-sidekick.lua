@@ -6,7 +6,7 @@ vim.g.loaded_gpt_sidekick = 1
 local prompts = require "gpt-sidekick.prompts"
 local filetypes = require "gpt-sidekick.filetypes"
 
-local MODELS = { "gpt-3.5-turbo", "gpt-4" }
+local MODELS = { "gpt-3.5-turbo-0125", "gpt-4-0125-preview" }
 
 for _, model in ipairs(MODELS) do
   vim.api.nvim_create_user_command("Ask" .. ((model == MODELS[1]) and "" or "4"), function(opts)

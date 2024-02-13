@@ -1,16 +1,9 @@
-if os.getenv "OPENAI_API_KEY" == nil then
-  vim.print "Error: OPENAI_API_KEY environment variable not set"
-  return
-end
-
-local openai = require "openai"
-local client = openai.new(os.getenv "OPENAI_API_KEY")
-
 local DEFAULT_SETTTINGS = {
   model = "gpt-3.5-turbo",
   temperature = 0.2,
-  max_tokens = 2048,
+  max_tokens = 4095,
   top_p = 1,
+  stream = true,
   frequency_penalty = 0,
   presence_penalty = 0,
 }
@@ -75,36 +68,38 @@ local function parse_prompt(prompt)
 
     ::continue::
   end
+
   return options
 end
 
 function M.ask(prompt_bufnr)
-  if os.getenv "OPENAI_API_KEY" == nil then
-    vim.print "Error: OPENAI_API_KEY environment variable not set"
-    return
-  end
-
   local buf_lines = vim.api.nvim_buf_get_lines(prompt_bufnr, 0, -1, false)
   local full_prompt = table.concat(buf_lines, "\n")
 
   local prompt_options = parse_prompt(full_prompt)
-  local status, res = client:chat(prompt_options.messages, prompt_options.settings)
 
-  if status == 200 then
-    if res.choices[1].message.content == nil then
-      vim.print("\nNo content found. Response:\n" .. vim.inspect(res))
-    end
-
-    local content = res.choices[1].message.content
-
-    local content_lines = vim.split(content, "[\r]?\n")
-    -- Add assistant response to buffer
-    vim.api.nvim_buf_set_lines(prompt_bufnr, -1, -1, false, { "", "ASSISTANT: " })
-    vim.api.nvim_buf_set_lines(prompt_bufnr, -1, -1, false, content_lines)
-    vim.api.nvim_buf_set_lines(prompt_bufnr, -1, -1, false, { "", "USER: " })
-  else
-    vim.print("\nError: " .. vim.inspect(res))
+  if os.getenv "OPENAI_API_KEY" == nil then
+    vim.schedule(function()
+      vim.notify("Error: OPENAI_API_KEY environment variable not set", vim.log.levels.ERROR)
+    end)
+    return
   end
+
+  local openai = require "gpt-sidekick.openai"
+  local client = openai.new(os.getenv "OPENAI_API_KEY")
+  local buffer = "ASSISTANT: "
+  client:chat(prompt_options.messages, prompt_options.settings, function(chars)
+    buffer = buffer .. chars
+
+    if buffer:find "\n" then
+      local lines = {}
+      for line in buffer:gmatch "[^\r\n]+" do
+        lines[#lines + 1] = line
+      end
+      vim.api.nvim_buf_set_lines(prompt_bufnr, -1, -1, false, lines)
+      buffer = ""
+    end
+  end)
 end
 
 return M
