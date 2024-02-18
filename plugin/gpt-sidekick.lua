@@ -79,8 +79,9 @@ for _, model in ipairs(MODELS) do
     vim.api.nvim_buf_set_option(buf, "filetype", "GptSidekickPrompt")
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
     -- Set cursor to the end of the buffer
-    vim.api.nvim_win_set_cursor(0, { #lines, #lines[#lines] })
-    vim.api.nvim_command "startinsert"
+    vim.api.nvim_win_set_cursor(0, {vim.api.nvim_buf_line_count(buf), 0})
+    -- Enter insert mode at the end of the line
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('A', true, false, true), 'n', false)
   end, { range = true })
 
   vim.api.nvim_create_user_command("Sask" .. ((model == MODELS[1]) and "" or "4"), function(opts)
