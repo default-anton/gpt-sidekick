@@ -87,18 +87,33 @@ function M.ask(prompt_bufnr)
 
   local openai = require "gpt-sidekick.openai"
   local client = openai.new(os.getenv "OPENAI_API_KEY")
-  local buffer = "ASSISTANT: "
-  client:chat(prompt_options.messages, prompt_options.settings, function(chars)
+  local buffer = "\nASSISTANT: "
+  client:chat(prompt_options.messages, prompt_options.settings, function(state, chars)
     buffer = buffer .. chars
 
-    if buffer:find "\n" then
-      local lines = {}
-      for line in buffer:gmatch "[^\r\n]+" do
-        lines[#lines + 1] = line
-      end
-      vim.api.nvim_buf_set_lines(prompt_bufnr, -1, -1, false, lines)
-      buffer = ""
+    if openai.DONE == state then
+      vim.print("DONE")
+      buffer = buffer .. "\n\nUSER: "
     end
+
+    if not buffer:find "\n" then
+      return
+    end
+
+    local lines = vim.split(buffer, "\n")
+    local carry_over = ""
+
+    -- if last line is not empty and we are in the middle of a message, carry it over
+    if #lines > 0 and lines[#lines] ~= "" and state == openai.DATA then
+      carry_over = table.remove(lines)
+    end
+
+    if lines[#lines] == "" and #lines > 1 then
+      table.remove(lines)
+    end
+
+    vim.api.nvim_buf_set_lines(prompt_bufnr, -1, -1, false, lines)
+    buffer = carry_over
   end)
 end
 
