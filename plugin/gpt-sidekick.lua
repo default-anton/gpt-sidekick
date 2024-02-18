@@ -76,7 +76,7 @@ for _, model in ipairs(MODELS) do
       title_pos = "left",
     })
     local lines = vim.split(prompt, "[\r]?\n")
-    vim.api.nvim_buf_set_option(buf, "filetype", "GptSidekickPrompt")
+    vim.api.nvim_buf_set_option(buf, "filetype", "GptSidekickChat")
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
     -- Set cursor to the end of the buffer
     vim.api.nvim_win_set_cursor(0, {vim.api.nvim_buf_line_count(buf), 0})
