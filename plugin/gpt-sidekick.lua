@@ -61,16 +61,18 @@ for _, model in ipairs(MODELS) do
     local winid = vim.api.nvim_get_current_win()
     local width = vim.api.nvim_win_get_width(winid)
     local height = vim.api.nvim_win_get_height(winid)
-    local win_width = math.floor(width * 0.9)
-    local win_height = math.floor(height * 0.9)
+    local win_width = math.floor(width * 0.8)
+    local win_height = math.floor(height * 0.8)
+    local row = math.floor((height - win_height) / 2)
+    local col = math.floor((width - win_width) / 2)
 
     vim.api.nvim_open_win(buf, true, {
       relative = "editor",
       style = "minimal",
       width = win_width,
       height = win_height,
-      row = math.floor((height - win_width) / 2),
-      col = math.floor((width - win_height) / 2),
+      row = row,
+      col = col,
       border = "rounded",
       title = "Prompt",
       title_pos = "left",
