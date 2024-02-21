@@ -92,7 +92,6 @@ function M.ask(prompt_bufnr)
     buffer = buffer .. chars
 
     if openai.DONE == state then
-      vim.print("DONE")
       buffer = buffer .. "\n\nUSER: "
     end
 

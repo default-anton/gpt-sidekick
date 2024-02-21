@@ -149,7 +149,6 @@ for _, model in ipairs(MODELS) do
 
       if ok then
         vim.fn.setreg("+", arguments.code)
-        vim.print(arguments.code)
       else
         vim.print "\nError decoding arguments. Function call:\n"
         vim.print(vim.inspect(function_call))
