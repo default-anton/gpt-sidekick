@@ -87,32 +87,30 @@ function M.ask(prompt_bufnr)
 
   local openai = require "gpt-sidekick.openai"
   local client = openai.new(os.getenv "OPENAI_API_KEY")
-  local buffer = "\nASSISTANT: "
+
+  local current_line = "ASSISTANT: "
+  vim.api.nvim_buf_set_lines(prompt_bufnr, -1, -1, false, {"", current_line})
+
   client:chat(prompt_options.messages, prompt_options.settings, function(state, chars)
-    buffer = buffer .. chars
+    local new_line_pos = chars:find "\n"
+    while new_line_pos ~= nil and state == openai.DATA do
+      current_line = current_line .. chars:sub(1, new_line_pos - 1)
+      vim.api.nvim_buf_set_lines(prompt_bufnr, -2, -1, false, {current_line, ""})
+      current_line = ""
+      chars = chars:sub(new_line_pos + 1)
+      new_line_pos = chars:find "\n"
+    end
+
+    current_line = current_line .. chars
+
+    if current_line ~= "" then
+      vim.api.nvim_buf_set_lines(prompt_bufnr, -2, -1, false, {current_line})
+    end
 
     if openai.DONE == state then
-      buffer = buffer .. "\n\nUSER: "
-    end
-
-    if not buffer:find "\n" then
+      vim.api.nvim_buf_set_lines(prompt_bufnr, -1, -1, false, {"", "USER: "})
       return
     end
-
-    local lines = vim.split(buffer, "\n")
-    local carry_over = ""
-
-    -- if last line is not empty and we are in the middle of a message, carry it over
-    if #lines > 0 and lines[#lines] ~= "" and state == openai.DATA then
-      carry_over = table.remove(lines)
-    end
-
-    if lines[#lines] == "" and #lines > 1 then
-      table.remove(lines)
-    end
-
-    vim.api.nvim_buf_set_lines(prompt_bufnr, -1, -1, false, lines)
-    buffer = carry_over
   end)
 end
 
