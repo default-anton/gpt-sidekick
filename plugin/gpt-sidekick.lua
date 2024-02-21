@@ -86,54 +86,6 @@ for _, model in ipairs(MODELS) do
     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('A', true, false, true), 'n', false)
   end, { range = true })
 
-  vim.api.nvim_create_user_command("Sask" .. ((model == MODELS[1]) and "" or "4"), function(opts)
-    if os.getenv "OPENAI_API_KEY" == nil then
-      vim.print "Error: OPENAI_API_KEY environment variable not set"
-      return
-    end
-
-    local openai = require "openai"
-    local client = openai.new(os.getenv "OPENAI_API_KEY")
-
-    local filetype = vim.api.nvim_buf_get_option(0, "filetype")
-    if filetypes[filetype] == nil then
-      vim.print("Error: filetype " .. filetype .. " not supported")
-      return
-    end
-
-    local language = filetypes[filetype]
-    local prompt = opts.args
-
-    if opts.range == 2 then
-      local lines = vim.api.nvim_buf_get_lines(0, opts.line1 - 1, opts.line2, false)
-      local context = table.concat(lines, "\n")
-
-      prompt = prompt .. "Context: ```" .. language.code .. "\n" .. context .. "\n```\n\n" .. prompt
-    end
-
-    local status, res = client:chat({
-      {
-        role = "system",
-        content = string.format(prompts.ask_system_prompt, language.technologies),
-      },
-      { role = "user", content = prompt },
-    }, {
-      model = model,
-      temperature = 0.5,
-    })
-
-    if status == 200 then
-      if res.choices[1].message.content == nil then
-        vim.print("\nNo content found. Response:\n" .. vim.inspect(res))
-        return
-      end
-
-      vim.print(res.choices[1].message.content)
-    else
-      vim.print("\nError: " .. vim.inspect(res))
-    end
-  end, { range = true, nargs = "+" })
-
   vim.api.nvim_create_user_command("Sedit" .. ((model == MODELS[1]) and "" or "4"), function(opts)
     if os.getenv "OPENAI_API_KEY" == nil then
       vim.print "Error: OPENAI_API_KEY environment variable not set"
