@@ -50,7 +50,7 @@ for _, model in ipairs(MODELS) do
       buf,
       "n",
       "<CR>",
-      string.format("<cmd>lua require('gpt-sidekick.actions').ask(%d)<CR>", buf),
+      string.format("<cmd>lua require('gpt-sidekick').ask(%d)<CR>", buf),
       {
         nowait = true,
         noremap = true,
