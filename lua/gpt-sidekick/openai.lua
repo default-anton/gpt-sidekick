@@ -33,18 +33,18 @@ function openai:chat(messages, settings, callback)
   require 'plenary.job':new({
     command = "curl",
     args = curl_args,
-    on_stdout = function(_, line)
-      if not line or #line == 0 then
+    on_stdout = function(_, chars)
+      if not chars or #chars == 0 then
         return
       end
 
-      line = string.gsub(line, "^data: ", "")
-      if line == "[DONE]" then
+      chars = string.gsub(chars, "^data: ", "")
+      if chars == "[DONE]" then
         callback(openai.DONE, "")
         return
       end
 
-      local ok, response = pcall(vim.json.decode, line)
+      local ok, response = pcall(vim.json.decode, chars)
 
       if ok and response and response.choices and response.choices[1] and response.choices[1] then
         if response.choices[1].delta and response.choices[1].delta.content then
@@ -52,7 +52,7 @@ function openai:chat(messages, settings, callback)
         end
       else
         vim.schedule(function()
-          vim.notify("each line Error: " .. line, vim.log.levels.ERROR)
+          vim.notify("chars Error: " .. chars, vim.log.levels.ERROR)
         end)
       end
     end,
