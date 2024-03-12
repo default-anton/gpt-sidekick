@@ -9,6 +9,7 @@ local filetypes = require "gpt-sidekick.filetypes"
 local MODELS = {
   "gpt-4-turbo-preview",
   "gpt-3.5-turbo",
+  "mixtral-8x7b-32768",
 }
 
 vim.api.nvim_create_user_command("Ask", function(opts)
@@ -25,8 +26,6 @@ vim.api.nvim_create_user_command("Ask", function(opts)
     temperature = 0.2,
     max_tokens = 2048,
     top_p = 1,
-    frequency_penalty = 0,
-    presence_penalty = 0,
   }
 
   local prompt = ""

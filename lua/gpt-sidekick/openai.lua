@@ -16,15 +16,18 @@ function openai:chat(messages, settings, callback)
     temperature = settings.temperature or 0.2,
     max_tokens = settings.max_tokens or 4095,
     top_p = settings.top_p or 1,
-    frequency_penalty = settings.frequency_penalty or 0,
-    presence_penalty = settings.presence_penalty or 0,
     messages = messages
   }
+
+  local url = "https://api.openai.com/v1/chat/completions"
+  if data.model == "mixtral-8x7b-32768" then
+    url = "https://api.groq.com/openai/v1/chat/completions"
+  end
 
   local curl_args = {
     "--silent",
     "--no-buffer",
-    "https://api.openai.com/v1/chat/completions",
+    url,
     "-H", "Content-Type: application/json",
     "-H", "Authorization: Bearer " .. self.api_key,
     "--data", vim.json.encode(data),

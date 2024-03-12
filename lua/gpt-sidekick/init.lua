@@ -4,8 +4,6 @@ local DEFAULT_SETTTINGS = {
   max_tokens = 4095,
   top_p = 1,
   stream = true,
-  frequency_penalty = 0,
-  presence_penalty = 0,
 }
 
 local M = {}
@@ -75,18 +73,22 @@ end
 function M.ask(prompt_bufnr)
   local buf_lines = vim.api.nvim_buf_get_lines(prompt_bufnr, 0, -1, false)
   local full_prompt = table.concat(buf_lines, "\n")
-
   local prompt_options = parse_prompt(full_prompt)
 
-  if os.getenv "OPENAI_API_KEY" == nil then
+  local env_name = "OPENAI_API_KEY"
+  if prompt_options.settings.model == "mixtral-8x7b-32768" then
+    env_name = "GROQ_API_KEY"
+  end
+
+  if os.getenv(env_name) == nil then
     vim.schedule(function()
-      vim.notify("Error: OPENAI_API_KEY environment variable not set", vim.log.levels.ERROR)
+      vim.notify("Error: ".. env_name .. " environment variable not set", vim.log.levels.ERROR)
     end)
     return
   end
 
   local openai = require "gpt-sidekick.openai"
-  local client = openai.new(os.getenv "OPENAI_API_KEY")
+  local client = openai.new(os.getenv(env_name))
 
   local current_line = "ASSISTANT: "
   vim.api.nvim_buf_set_lines(prompt_bufnr, -1, -1, false, {"", current_line})
