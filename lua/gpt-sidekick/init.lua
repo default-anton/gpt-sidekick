@@ -1,9 +1,8 @@
 local DEFAULT_SETTTINGS = {
   model = "gpt-3.5-turbo",
-  temperature = 0.2,
   max_tokens = 4095,
-  top_p = 1,
   stream = true,
+  temperature = 0.2,
 }
 
 local M = {}

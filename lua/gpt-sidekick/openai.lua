@@ -13,9 +13,8 @@ function openai:chat(messages, settings, callback)
   local data = {
     model = settings.model or "gpt-3.5-turbo",
     stream = settings.stream,
-    temperature = settings.temperature or 0.2,
+    temperature = settings.temperature or 0.0,
     max_tokens = settings.max_tokens or 4095,
-    top_p = settings.top_p or 1,
     messages = messages
   }
 
