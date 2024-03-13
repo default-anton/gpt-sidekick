@@ -33,19 +33,26 @@ vim.api.nvim_create_user_command("Ask", function(opts)
   end
 
   if language == nil then
-    prompt = prompt .. "\nSYSTEM: \nUSER: "
-  else
-    prompt = prompt .. "\nSYSTEM: " .. string.format(prompts.ask_system_prompt, language.technologies) .. "\n"
+    prompt = prompt .. "\nSYSTEM: "
 
     if opts.range == 2 then
       local lines = vim.api.nvim_buf_get_lines(0, opts.line1 - 1, opts.line2, false)
       local context = table.concat(lines, "\n")
 
-      prompt = prompt .. "Context: ```" .. language.code .. "\n" .. context .. "\n```\n\n"
+      prompt = prompt .. "Context: ```\n" .. context .. "\n```"
     end
+  else
+    prompt = prompt .. "\nSYSTEM: " .. string.format(vim.trim(prompts.ask_system_prompt), language.technologies)
 
-    prompt = prompt .. "USER: "
+    if opts.range == 2 then
+      local lines = vim.api.nvim_buf_get_lines(0, opts.line1 - 1, opts.line2, false)
+      local context = table.concat(lines, "\n")
+
+      prompt = prompt .. "\n\nContext: ```" .. language.code .. "\n" .. context .. "\n```"
+    end
   end
+
+  prompt = prompt .. "\n\nUSER: "
 
   -- Create a new floating window
   local buf = vim.api.nvim_create_buf(false, true)
