@@ -24,7 +24,7 @@ vim.api.nvim_create_user_command("Ask", function(opts)
   local settings = {
     model = model,
     max_tokens = 2048,
-    temperature = 0.2,
+    temperature = 0.0,
   }
 
   local prompt = ""
