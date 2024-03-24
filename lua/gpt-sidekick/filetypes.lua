@@ -10,4 +10,5 @@ return {
   python = { code = "python", technologies = "Python" },
   go = { code = "go", technologies = "Go" },
   bash = { code = "sh", technologies = "Bash" },
+  dart = { code = "dart", technologies = "Dart, Flutter" },
 }
